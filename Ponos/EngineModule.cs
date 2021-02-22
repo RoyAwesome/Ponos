@@ -5,6 +5,7 @@ using Ponos.API.Commands;
 using Ponos.API.Interfaces;
 using Ponos.API.Tasks;
 using Ponos.API.Threading;
+using Ponos.Commands;
 using Ponos.Threading;
 using System;
 using System.Collections.Generic;
@@ -37,6 +38,11 @@ namespace Ponos
 
             builder.RegisterType<CommandBuilder>()
                 .As<ICommandBuilder>()
+                .As<IApplicationEventListener>()
+                .SingleInstance();
+
+            builder.RegisterType<MockScheduler>()
+                .AsSelf()
                 .As<IApplicationEventListener>()
                 .SingleInstance();
         }

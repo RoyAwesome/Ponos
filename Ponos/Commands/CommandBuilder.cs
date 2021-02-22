@@ -11,7 +11,13 @@ namespace Ponos.Commands
 {
     class CommandBuilder : ICommandBuilder, IApplicationEventListener
     {
-        Dictionary<string, ICommandStage> Stages;
+        Dictionary<string, ICommandStage> Stages = new();
+
+        private readonly MockScheduler mockScheduler;
+        public CommandBuilder(MockScheduler scheduler)
+        {
+            mockScheduler = scheduler;
+        }
 
         public void OnApplicationEvent(ApplicationEvent Stage)
         {
@@ -43,7 +49,13 @@ namespace Ponos.Commands
             CommandStage stage = new(name, RunMode, fixedRate);
             Stages[name] = stage;
 
-            //TODO: Schedule this stage
+            //If it's a custom schedule, then someone else will schedule us
+            //Fixed rate and variable rate though, they need to be scheduled right away
+            if(RunMode != CommandStageRunMode.Custom)
+            {
+                mockScheduler.ScheduleStage(stage);
+            }
+           
 
             return stage;
         }

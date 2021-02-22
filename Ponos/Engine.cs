@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using Ponos.API.Threading;
 using Ponos.Threading;
 using Ponos.API.Interfaces;
+using Ponos.API.Commands;
 
 namespace Ponos
 {
@@ -48,6 +49,31 @@ namespace Ponos
             return Task.CompletedTask;
         }
 
+        class SendApplicationStartupEvent : ICommandSystem
+        {
+            readonly ApplicationEvent Event;
+
+            readonly IComponentContext componentContext;
+
+            static Logger logger = NLog.LogManager.GetCurrentClassLogger();
+            public SendApplicationStartupEvent(ApplicationEvent Event, IComponentContext componentContext)
+            {
+                this.Event = Event;
+                this.componentContext = componentContext;
+            }
+            public void Run()
+            {
+                logger.Info("Running Stage: {0}", Event);
+                //TODO: Split this work up onto the task graph!
+                var listeners = componentContext.Resolve<IEnumerable<IApplicationEventListener>>();
+                foreach (var listener in listeners)
+                {
+                    listener.OnApplicationEvent(Event);
+                }
+            }
+        }
+
+
         private void OnStarted()
         {
             Logger.Info("Starting up {0} version: {1}", Name, Version);
@@ -70,12 +96,44 @@ namespace Ponos
             var GameInstace = componentContext.Resolve<IGameInstance>();
             Logger.Info("Using {0} ({1})", GameInstace, GameInstace.Version);
 
-            threader.Enqueue(() => BeginApplicationStage(ApplicationEvent.Startup));
+            BeginApplicationStage(ApplicationEvent.Startup);
+           
+
+            //Create the default stages
+            var CommandBuilder = componentContext.Resolve<ICommandBuilder>(); 
+            CommandBuilder.InManualStage(StageNames.Startup, (stage) =>
+            {
+                stage.AddSystem(new SendApplicationStartupEvent(ApplicationEvent.Startup, componentContext));
+            })
+            .InManualStage(StageNames.RendererInit, (stage) =>
+            {
+                stage.AddSystem(new SendApplicationStartupEvent(ApplicationEvent.RendererInit, componentContext));
+            })
+            .InManualStage(StageNames.Begin, (stage) =>
+            {
+                stage.AddSystem(new SendApplicationStartupEvent(ApplicationEvent.Begin, componentContext));
+
+            })
+            .InManualStage(StageNames.Shutdown, (stage) =>
+            {
+                stage.AddSystem(new SendApplicationStartupEvent(ApplicationEvent.Shutdown, componentContext));
+            });
+
+
+            var ms = componentContext.Resolve<MockScheduler>();
+            ms.Start();
+
+            ms.ScheduleStage(CommandBuilder.GetStageByName(StageNames.Startup));
+            ms.ScheduleStage(CommandBuilder.GetStageByName(StageNames.RendererInit));
+
+            ms.ScheduleStage(CommandBuilder.GetStageByName(StageNames.Begin));
+
 
         }
 
         private void OnStopping()
         {
+            
             Logger.Info("Shutting down the engine");
             EngineScope.Dispose();
         }
@@ -87,12 +145,7 @@ namespace Ponos
 
         protected void BeginApplicationStage(ApplicationEvent stage)
         {
-            //TODO: Split this work up onto the task graph!
-            var listeners = componentContext.Resolve<IEnumerable<IApplicationEventListener>>();
-            foreach(var listener in listeners)
-            {
-                listener.OnApplicationEvent(stage);
-            }
+          
         }
     }
 }

@@ -13,6 +13,8 @@ using Veldrid.StartupUtilities;
 using Veldrid;
 using Veldrid.Sdl2;
 using System.Numerics;
+using Ponos.API.Commands;
+using System.Runtime.CompilerServices;
 
 namespace Ponos.RenderGraph.Veldrid
 {
@@ -39,22 +41,30 @@ namespace Ponos.RenderGraph.Veldrid
             set;
         } = true;
       
-        ITaskService jobService;
+      
+        readonly ICommandBuilder commandBuilder;
 
         public Sdl2Window SDL2Window;
 
-        Vector2 ScreenSize = new Vector2(400, 600);
+        Vector2 ScreenSize = new Vector2(800, 600);
 
-        public VeldridWindowService(ITaskService jobService, IThreadService threadService)
+        public VeldridWindowService(ICommandBuilder commandBuilder)
         {
-            this.jobService = jobService;
+            this.commandBuilder = commandBuilder;
         }
 
         public void OnApplicationEvent(ApplicationEvent Stage)
         {
             if(Stage == ApplicationEvent.Startup)
             {
-                jobService.Enqueue(CreateWindow, RequiredThread);
+                commandBuilder.InManualStage(StageNames.RendererInit, (stage) =>
+                {
+                    stage.AddSystem(new CreateWindowService(this));
+                })
+                .InFixedRateStage(StageNames.Fixed_60Hz, 1.0 / 60.0, (stage) =>
+                {
+                    stage.AddSystem(new PumpWindowEventsService(this));
+                });
             }
             if(Stage == ApplicationEvent.Shutdown)
             {
@@ -62,32 +72,43 @@ namespace Ponos.RenderGraph.Veldrid
             }
         }
 
-        public void CreateWindow()
+        class CreateWindowService : ICommandSystem
         {
-            this.CheckThreadExecution();
+            public VeldridWindowService windowService;
 
-            WindowCreateInfo windowCI = new WindowCreateInfo
+            public CreateWindowService(VeldridWindowService windowService)
             {
-                X = 100,
-                Y = 100,
-                WindowWidth = (int)ScreenSize.X,
-                WindowHeight = (int)ScreenSize.Y,
-                WindowInitialState = WindowState.Normal,
-                WindowTitle = "Intro",
-            };
+                this.windowService = windowService;
+            }
 
-            SDL2Window = VeldridStartup.CreateWindow(ref windowCI);
-
-            jobService.Enqueue(async () =>
+            public void Run()
             {
-                //TODO: Cancellations
-                while(KeepRunning)
+                WindowCreateInfo windowCI = new WindowCreateInfo
                 {
-                    SDL2Window.PumpEvents();
-                    await Task.Delay(TimeSpan.FromSeconds(1.0 / 60.0));
-                }                
-            },
-            RequiredThread);
+                    X = 100,
+                    Y = 100,
+                    WindowWidth = (int)windowService.ScreenSize.X,
+                    WindowHeight = (int)windowService.ScreenSize.Y,
+                    WindowInitialState = WindowState.Normal,
+                    WindowTitle = "Intro",
+                };
+
+                windowService.SDL2Window = VeldridStartup.CreateWindow(ref windowCI);
+            }
         }
+
+        class PumpWindowEventsService : ICommandSystem
+        {
+            public VeldridWindowService windowService;
+
+            public PumpWindowEventsService(VeldridWindowService windowService)
+            {
+                this.windowService = windowService;
+            }
+            public void Run()
+            {
+                windowService.SDL2Window.PumpEvents();
+            }
+        }    
     }
 }

@@ -17,9 +17,11 @@ namespace Ponos.API
 
     public static class StageNames
     {
+        public const string Default = "Default";
         public const string Startup = "Startup";
         public const string RendererInit = "RendererInit";
         public const string Shutdown = "Shutdown";
+        public const string Begin = "Begin";
         public const string Fixed_30Hz = "30HZ";
         public const string Fixed_60Hz = "60HZ";
         public const string Fixed_120Hz = "120HZ";

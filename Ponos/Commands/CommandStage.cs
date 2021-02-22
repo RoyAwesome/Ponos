@@ -21,6 +21,11 @@ namespace Ponos.Commands
             set;
         }
         
+        public string Name
+        {
+            get;
+            set;
+        }
 
         public IEnumerable<ICommandStage> RunAfter => null;
 
@@ -30,13 +35,15 @@ namespace Ponos.Commands
         {
             this.RunMode = RunMode;
             this.RunRate = FixedRate;
+            this.Name = name;
         }
 
         public void Execute()
         {
             foreach(var sys in Systems)
             {
-                //Schedule this system
+                //TODO: Schedule these
+                sys.Run();
             }
         }
 

@@ -75,15 +75,17 @@ namespace Ponos.API.Commands
             return commandBuilder;
         }
 
-        public static void ExecuteManualStage(this ICommandBuilder commandBuilder, string name)
+        public static ICommandBuilder InStage(this ICommandBuilder commandBuilder, string name, Action<ICommandStage> runAfter = null)
         {
             var stage = commandBuilder.GetStageByName(name);
-
-            if (stage != null && stage.RunMode == CommandStageRunMode.Custom)
+            if(stage != null)
             {
-                stage.Execute();
+                runAfter(stage);
             }
+
+            return commandBuilder;
         }
+       
         
     }
 }
