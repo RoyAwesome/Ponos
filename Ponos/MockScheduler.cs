@@ -21,13 +21,14 @@ namespace Ponos
         {
             public double TimeRemaining;
             public ICommandStage Stage;
+            public bool RemoveAfterExecute;
         }
 
         public bool ShouldLoop = true;
+       
+        Channel<Action> ThreadCommandQueue = Channel.CreateUnbounded<Action>();
 
-        BlockingCollection<ICommandStage> VariableStages = new();
-        BlockingCollection<FixedRateStage> FixedRateStages = new();
-        Channel<ICommandStage> ManualExecuteChannel = Channel.CreateUnbounded<ICommandStage>();
+        
 
         Stopwatch stopwatch = new();
 
@@ -49,34 +50,34 @@ namespace Ponos
 
         public void ScheduleStage(ICommandStage stage)
         {
-            
-            if(stage.RunMode == CommandStageRunMode.Variable)
+            ThreadCommandQueue.Writer.TryWrite(() =>
             {
-                lock(VariableStages)
-                {
-                    VariableStages.Add(stage);
-                }
-               
+                Thead_ScheduleStage(stage);
+            });          
+        }
+         ThreadLocal<List<FixedRateStage>> Thread_Stages = new(() => new());
+
+
+        private void Thead_ScheduleStage(ICommandStage stage)
+        {
+            logger.Info("Scheduing Stage {0}", stage.ToString());
+
+            var Stages = Thread_Stages.Value;
+           
+            //If we have this stage, don't bother scheduling it
+            if(Stages.Select(x => x.Stage).Contains(stage))
+            {
+                return;
             }
 
-            if(stage.RunMode == CommandStageRunMode.Fixed)
-            {
-                lock(FixedRateStages)
-                {
-                    FixedRateStages.Add(new FixedRateStage()
-                    {
-                        TimeRemaining = 0,
-                        Stage = stage,
-                    });
-                }                
-            }
 
-            if(stage.RunMode == CommandStageRunMode.Custom)
+            Stages.Add(new FixedRateStage()
             {
-                ManualExecuteChannel.Writer.TryWrite(stage);
-            }
-        }       
-      
+                Stage = stage,
+                TimeRemaining = stage.RunMode == CommandStageRunMode.Fixed ? stage.RunRate : 0,
+                RemoveAfterExecute = stage.RunMode == CommandStageRunMode.Custom,
+            });
+        }
 
         public void RunLoop()
         {
@@ -85,33 +86,41 @@ namespace Ponos
             while(ShouldLoop)
             {
                 long FrameStart = stopwatch.ElapsedTicks;
-                while(ManualExecuteChannel.Reader.TryRead(out ICommandStage ManualStage))
-                {
-                    logger.Info("Executing stage {0}", ManualStage.GetType().ToString());
 
-                    ManualStage.Execute();
-                }
-                              
-
-                foreach (var stage in VariableStages)
+                //If we have any commands that need doing, lets do them now
+                while(ThreadCommandQueue.Reader.TryRead(out Action command))
                 {
-                    stage.Execute();
+                    command();
                 }
 
                 long FrameDelta = stopwatch.ElapsedTicks - FrameStart;
                 double FrameDeltaMs = (double)(FrameDelta) / (double)TimeSpan.TicksPerMillisecond;
 
-                foreach(var frs in FixedRateStages)
+                var Stages = Thread_Stages.Value;
+                //Run any stages we have scheduled
+                for(int i = 0; i < Stages.Count; i++)
                 {
+                    var frs = Stages[i];
+
                     frs.TimeRemaining = frs.TimeRemaining - FrameDeltaMs;
-                  
-                    if(frs.TimeRemaining <= 0)
+
+                    if (frs.TimeRemaining <= 0)
                     {
                         frs.Stage.Execute();
-                        frs.TimeRemaining = frs.Stage.RunRate;
+                        foreach (var action in frs.Stage.RunAfter)
+                        {
+                            action();
+                        }
+                        frs.TimeRemaining = frs.Stage.RunMode == CommandStageRunMode.Fixed ? frs.Stage.RunRate : 0;
                     }
 
-                }
+                    if(frs.RemoveAfterExecute)
+                    {
+                        Stages.RemoveAt(i);
+                        i--;
+                    }
+
+                }               
 
                 Thread.Sleep(1);
             }
@@ -120,14 +129,7 @@ namespace Ponos
 
         public void OnApplicationEvent(ApplicationEvent Stage)
         {
-            if(Stage == ApplicationEvent.Begin)
-            {
-                var CommandBuilder = componentContext.Resolve<ICommandBuilder>();
-                CommandBuilder.InVariableStage(StageNames.Default)
-                    .InFixedRateStage(StageNames.Fixed_30Hz, 1.0 / 30.0)
-                    .InFixedRateStage(StageNames.Fixed_60Hz, 1.0 / 60.0)
-                    .InFixedRateStage(StageNames.Fixed_120Hz, 1.0 / 120.0);
-            }
+           
         }
     }
 }

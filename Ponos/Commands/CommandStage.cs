@@ -13,7 +13,7 @@ namespace Ponos.Commands
         {
             get;
             set;
-        }
+        } = CommandStageRunMode.Custom;
 
         public double RunRate
         {
@@ -27,14 +27,13 @@ namespace Ponos.Commands
             set;
         }
 
-        public IEnumerable<ICommandStage> RunAfter => null;
+        public IList<Action> RunAfter { get; } 
+            = new List<Action>();
 
         List<ICommandSystem> Systems = new();
 
-        public CommandStage(string name, CommandStageRunMode RunMode, double FixedRate = 0.0)
+        public CommandStage(string name)
         {
-            this.RunMode = RunMode;
-            this.RunRate = FixedRate;
             this.Name = name;
         }
 
@@ -50,6 +49,11 @@ namespace Ponos.Commands
         void ICommandStage.AddSystem(ICommandSystem system)
         {
             Systems.Add(system);
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0} - RunMode: {1}", Name, RunMode.ToString());
         }
     }
 }

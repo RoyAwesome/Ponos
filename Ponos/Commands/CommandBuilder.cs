@@ -38,25 +38,35 @@ namespace Ponos.Commands
         {
             stage.Execute();
         }
-
-        ICommandStage ICommandBuilder.CreateStage(string name, CommandStageRunMode RunMode, double fixedRate)
+        private ICommandStage GetOrCreateStageInternal(string name)
         {
-            if(Stages.ContainsKey(name))
+            if (Stages.ContainsKey(name))
             {
                 return Stages[name];
             }
 
-            CommandStage stage = new(name, RunMode, fixedRate);
+            CommandStage stage = new(name);
             Stages[name] = stage;
 
-            //If it's a custom schedule, then someone else will schedule us
-            //Fixed rate and variable rate though, they need to be scheduled right away
-            if(RunMode != CommandStageRunMode.Custom)
-            {
-                mockScheduler.ScheduleStage(stage);
-            }
-           
+            return stage;
+        }
 
+        ICommandStage ICommandBuilder.CreateStage(string name)
+        {
+            return GetOrCreateStageInternal(name);
+        }
+
+        ICommandStage ICommandBuilder.ScheduleStage(string name, CommandStageRunMode RunMode, double fixedRate)
+        {
+            CommandStage stage = GetOrCreateStageInternal(name) as CommandStage;
+
+            stage.RunMode = RunMode;
+            stage.RunRate = fixedRate;
+
+            //If it's a custom schedule, then someone else will schedule us
+            //Fixed rate and variable rate though, they need to be scheduled right away           
+            mockScheduler.ScheduleStage(stage);
+           
             return stage;
         }
     }

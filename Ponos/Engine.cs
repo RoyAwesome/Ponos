@@ -96,8 +96,8 @@ namespace Ponos
             var GameInstace = componentContext.Resolve<IGameInstance>();
             Logger.Info("Using {0} ({1})", GameInstace, GameInstace.Version);
 
-            BeginApplicationStage(ApplicationEvent.Startup);
-           
+            var ms = componentContext.Resolve<MockScheduler>();
+            ms.Start();
 
             //Create the default stages
             var CommandBuilder = componentContext.Resolve<ICommandBuilder>(); 
@@ -113,6 +113,15 @@ namespace Ponos
             {
                 stage.AddSystem(new SendApplicationStartupEvent(ApplicationEvent.Begin, componentContext));
 
+                stage.RunAfter.Add(() =>
+                {
+                    CommandBuilder
+                        .Schedule(StageNames.Default, CommandStageRunMode.Variable)
+                        .Schedule(StageNames.Fixed_30Hz, CommandStageRunMode.Fixed, 1.0 / 30.0)
+                        .Schedule(StageNames.Fixed_60Hz, CommandStageRunMode.Fixed, 1.0 / 60.0)
+                        .Schedule(StageNames.Fixed_120Hz, CommandStageRunMode.Fixed, 1.0 / 120.0);
+                });
+
             })
             .InManualStage(StageNames.Shutdown, (stage) =>
             {
@@ -120,14 +129,10 @@ namespace Ponos
             });
 
 
-            var ms = componentContext.Resolve<MockScheduler>();
-            ms.Start();
-
-            ms.ScheduleStage(CommandBuilder.GetStageByName(StageNames.Startup));
-            ms.ScheduleStage(CommandBuilder.GetStageByName(StageNames.RendererInit));
-
-            ms.ScheduleStage(CommandBuilder.GetStageByName(StageNames.Begin));
-
+            CommandBuilder
+                    .Schedule(StageNames.Startup, CommandStageRunMode.Custom)
+                    .Schedule(StageNames.RendererInit, CommandStageRunMode.Custom)
+                    .Schedule(StageNames.Begin, CommandStageRunMode.Custom);
 
         }
 

@@ -10,7 +10,9 @@ namespace Ponos.API.Commands
 {
     public interface ICommandBuilder
     {
-        protected internal ICommandStage CreateStage(string name, CommandStageRunMode RunMode, double fixedRate = 0.0f);
+        protected internal ICommandStage CreateStage(string name);
+
+        protected internal ICommandStage ScheduleStage(string name, CommandStageRunMode RunMode, double fixedRate = 0.0f);
 
         public ICommandStage GetStageByName(string name);
     }
@@ -41,11 +43,12 @@ namespace Ponos.API.Commands
         public static ICommandBuilder InVariableStage(this ICommandBuilder commandBuilder, string name, Action<ICommandStage> runAfter = null)
         {
             
-            var stage = commandBuilder.GetOrCreateStage(name, (cb, name) => cb.CreateStage(name, CommandStageRunMode.Variable));
+            var stage = commandBuilder.GetOrCreateStage(name, (cb, name) => cb.CreateStage(name));
             if(runAfter != null)
             {
                 runAfter(stage);
-            }          
+            }
+
             return commandBuilder;
         }
 
@@ -56,22 +59,24 @@ namespace Ponos.API.Commands
                 throw new ArgumentException("Must be greater than 0", nameof(fixedRate));
             }
 
-            var stage = commandBuilder.GetOrCreateStage(name, (cb, name) => cb.CreateStage(name, CommandStageRunMode.Fixed, fixedRate));
+            var stage = commandBuilder.GetOrCreateStage(name, (cb, name) => cb.CreateStage(name));
 
             if (runAfter != null)
             {
                 runAfter(stage);
             }
+
             return commandBuilder;
         }
 
         public static ICommandBuilder InManualStage(this ICommandBuilder commandBuilder, string name, Action<ICommandStage> runAfter = null)
         {
-            var stage = commandBuilder.GetOrCreateStage(name, (cb, name) => cb.CreateStage(name, CommandStageRunMode.Custom));
+            var stage = commandBuilder.GetOrCreateStage(name, (cb, name) => cb.CreateStage(name));
             if (runAfter != null)
             {
                 runAfter(stage);
             }
+
             return commandBuilder;
         }
 
@@ -82,6 +87,13 @@ namespace Ponos.API.Commands
             {
                 runAfter(stage);
             }
+
+            return commandBuilder;
+        }
+
+        public static ICommandBuilder Schedule(this ICommandBuilder commandBuilder, string name, CommandStageRunMode runMode, double fixedRate = 0.0)
+        {
+            commandBuilder.ScheduleStage(name, runMode, fixedRate);
 
             return commandBuilder;
         }

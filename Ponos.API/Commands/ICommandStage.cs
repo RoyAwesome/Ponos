@@ -38,9 +38,9 @@ namespace Ponos.API.Commands
         }
         
         /// <summary>
-        /// Which stages to run this after 
+        /// Which actions to run this after 
         /// </summary>
-        public IEnumerable<ICommandStage> RunAfter
+        public IList<Action> RunAfter
         {
             get;
         }
