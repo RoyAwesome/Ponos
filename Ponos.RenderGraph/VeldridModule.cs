@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Ponos.API.Interfaces;
+using Ponos.API.Rendering;
 using Ponos.API.Threading;
 using Ponos.API.Window;
 using Ponos.RenderGraph.Veldrid;
@@ -16,6 +17,10 @@ namespace Ponos.RenderGraph
                 .As<IWindowService>()
                 .As<IApplicationEventListener>()
                 .As<IThreadLocked>()
+                .SingleInstance();
+
+            builder.RegisterType<VeldridRenderingService>()
+                .As<IRenderingService>()
                 .SingleInstance();
         }
     }

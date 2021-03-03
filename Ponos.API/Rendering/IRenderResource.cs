@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace Ponos.API.Rendering
 {
-    public interface IRenderGraph : INamed
-    {
-        public void AddRenderPass(IRenderPass pass);
+    public interface IRenderResource : INamed
+    {       
+
     }
 }

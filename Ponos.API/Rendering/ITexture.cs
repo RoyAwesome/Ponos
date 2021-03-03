@@ -1,5 +1,4 @@
-﻿using Ponos.API.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Ponos.API.Rendering
 {
-    public interface IRenderGraph : INamed
+    public interface ITexture : IRenderResource
     {
-        public void AddRenderPass(IRenderPass pass);
+
     }
 }

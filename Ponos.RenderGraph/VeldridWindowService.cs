@@ -48,6 +48,8 @@ namespace Ponos.RenderGraph.Veldrid
 
         Vector2 ScreenSize = new Vector2(800, 600);
 
+        public event Action OnWindowCreated;
+
         public VeldridWindowService(ICommandBuilder commandBuilder)
         {
             this.commandBuilder = commandBuilder;
@@ -94,6 +96,8 @@ namespace Ponos.RenderGraph.Veldrid
                 };
 
                 windowService.SDL2Window = VeldridStartup.CreateWindow(ref windowCI);
+
+                windowService.OnWindowCreated?.Invoke();
             }
         }
 
