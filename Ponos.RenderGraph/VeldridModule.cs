@@ -13,15 +13,19 @@ namespace Ponos.RenderGraph
         protected override void Load(ContainerBuilder builder)
         {
             base.Load(builder);
+            builder.RegisterType<VeldridRenderingService>()
+                .As<IRenderingService>()
+                .SingleInstance()
+                .AutoActivate();
+
             builder.RegisterType<VeldridWindowService>()
                 .As<IWindowService>()
                 .As<IApplicationEventListener>()
                 .As<IThreadLocked>()
-                .SingleInstance();
+                .SingleInstance()
+                ;
 
-            builder.RegisterType<VeldridRenderingService>()
-                .As<IRenderingService>()
-                .SingleInstance();
+            
         }
     }
 }

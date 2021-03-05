@@ -15,7 +15,10 @@ namespace Ponos.API.Rendering
 
         public ITexture CreateTexture(string Name);
 
-        public IShader CreateShader(string Name);
+        public IShader CreateShader(string Name, ShaderStage shaderStage, ShaderFormat Format, byte[] byteCode);
+
+        //TODO: Async this
+        public IShader CompileShader(string Name, ShaderStage stage, ShaderFormat fromFormat, ShaderFormat toFormat, byte[] code);
 
         protected internal IRenderBuffer<T> CreateRenderBuffer<T>(string name, BufferUsage usage) where T : struct;
     }
@@ -36,5 +39,7 @@ namespace Ponos.API.Rendering
         {
             return renderingService.CreateRenderBuffer<T>(name, BufferUsage.Uniform);
         }
+
+        
     }
 }
