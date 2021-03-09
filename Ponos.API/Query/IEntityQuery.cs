@@ -16,6 +16,12 @@ namespace Ponos.API.Query
         }
     }
 
+    public class EntityQueryResult
+    {
+        public ECS.Entity Entity;
+    }
+
+
     public interface IEntityQuery<T> where T : struct
     {
         public IEnumerable<EntityQueryResult<T>> QueryResults
@@ -23,6 +29,14 @@ namespace Ponos.API.Query
             get;
             set;
         }
+    }
+
+    public class EntityQueryResult<T> where T : struct
+    {
+        public ECS.Entity Entity;
+
+        public ECS.ComponentRef<T> Component1;
+
     }
 
     public interface IEntityQuery<T, U>
@@ -34,6 +48,18 @@ namespace Ponos.API.Query
             get;
             set;
         }
+    }
+
+    public class EntityQueryResult<T, U>
+        where T : struct
+        where U : struct
+    {
+        public ECS.Entity Entity;
+
+        public ECS.ComponentRef<T> Component1;
+
+        public ECS.ComponentRef<U> Component2;
+
     }
 
 
