@@ -5,11 +5,15 @@ VisualStudioVersion = 16.0.30914.41
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ponos", "Ponos\Ponos.csproj", "{DDF97868-CA2D-4D17-AB36-C77BC5BD5283}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ponos.Startup", "Ponos.Startup\Ponos.Startup.csproj", "{1414B2D4-D8C3-411A-9147-B1D5689EC664}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ponos.Startup", "Ponos.Startup\Ponos.Startup.csproj", "{1414B2D4-D8C3-411A-9147-B1D5689EC664}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ponos.API", "Ponos.API\Ponos.API.csproj", "{D48AFC4E-0054-4A38-80C3-96B4670DE154}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ponos.API", "Ponos.API\Ponos.API.csproj", "{D48AFC4E-0054-4A38-80C3-96B4670DE154}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ponos.RenderGraph.Veldrid", "Ponos.RenderGraph\Ponos.RenderGraph.Veldrid.csproj", "{627F1430-5735-4655-BA95-6F3C59C5CFA5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ponos.RenderGraph.Veldrid", "Ponos.RenderGraph\Ponos.RenderGraph.Veldrid.csproj", "{627F1430-5735-4655-BA95-6F3C59C5CFA5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{69423052-380B-47AC-B861-7F36CE8C6AD0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ponos.Samples.BasicRendering", "Ponos.Samples.BasicRendering\Ponos.Samples.BasicRendering.csproj", "{39E690EB-99C8-4E92-85D2-AE2A8EA36B61}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,9 +37,16 @@ Global
 		{627F1430-5735-4655-BA95-6F3C59C5CFA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{627F1430-5735-4655-BA95-6F3C59C5CFA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{627F1430-5735-4655-BA95-6F3C59C5CFA5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39E690EB-99C8-4E92-85D2-AE2A8EA36B61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39E690EB-99C8-4E92-85D2-AE2A8EA36B61}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39E690EB-99C8-4E92-85D2-AE2A8EA36B61}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39E690EB-99C8-4E92-85D2-AE2A8EA36B61}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{39E690EB-99C8-4E92-85D2-AE2A8EA36B61} = {69423052-380B-47AC-B861-7F36CE8C6AD0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A9DD559B-C6E1-4C81-93AC-B3F53A6A9D30}

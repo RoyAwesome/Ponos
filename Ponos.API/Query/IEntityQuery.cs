@@ -7,61 +7,47 @@ using System.Threading.Tasks;
 
 namespace Ponos.API.Query
 {
-    public interface IEntityQuery
+    public class EntityQuery
     {
-        public IEnumerable<EntityQueryResult> QueryResults
+        internal protected Type[] IncludeComponents;
+        internal protected Type[] ExcludeComponents;
+        internal protected Type[] SelectComponents;
+
+        internal EntityQuery()
         {
-            get;
-            set;
+            
+        }
+
+    }
+
+    public static class EntityQueryStatics
+    {
+        public static EntityQuery SelectAllComponents(this EntityQuery query)
+        {
+            query.SelectComponents = null;
+
+            return query;
+        }
+
+        public static EntityQuery SelectComponents<T>(this EntityQuery query) where T : struct
+        {
+            query.SelectComponents = new Type[] { typeof(T) };
+            return query;
+        }
+
+        public static EntityQuery Include<T>(this EntityQuery query) where T : struct
+        {
+            query.IncludeComponents = new Type[] { typeof(T) };
+
+            return query;
+        }
+
+        public static EntityQuery Exclude<T>(this EntityQuery query) where T: struct
+        {
+            query.ExcludeComponents = new Type[] { typeof(T) };
+            return query;
         }
     }
-
-    public class EntityQueryResult
-    {
-        public ECS.Entity Entity;
-    }
-
-
-    public interface IEntityQuery<T> where T : struct
-    {
-        public IEnumerable<EntityQueryResult<T>> QueryResults
-        {
-            get;
-            set;
-        }
-    }
-
-    public class EntityQueryResult<T> where T : struct
-    {
-        public ECS.Entity Entity;
-
-        public ECS.ComponentRef<T> Component1;
-
-    }
-
-    public interface IEntityQuery<T, U>
-        where T : struct
-        where U : struct
-    {
-        public IEnumerable<EntityQueryResult<T, U>> QueryResults
-        {
-            get;
-            set;
-        }
-    }
-
-    public class EntityQueryResult<T, U>
-        where T : struct
-        where U : struct
-    {
-        public ECS.Entity Entity;
-
-        public ECS.ComponentRef<T> Component1;
-
-        public ECS.ComponentRef<U> Component2;
-
-    }
-
 
 
 }

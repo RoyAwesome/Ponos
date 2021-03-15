@@ -31,24 +31,42 @@ namespace Ponos.Commands
             = new List<Action>();
 
         List<ICommandSystem> Systems = new();
+        List<ICommandSystem> RunOnceSystems = new();
 
-        public CommandStage(string name)
+
+        CommandBuilder commandBuilder;
+
+        public CommandStage(string name, CommandBuilder commandBuilder)
         {
             this.Name = name;
+            this.commandBuilder = commandBuilder;
         }
 
         public void Execute()
         {
+            foreach(var rosys in RunOnceSystems)
+            {
+                commandBuilder.Schedule(rosys);
+            }
+            RunOnceSystems.Clear();
+
             foreach(var sys in Systems)
             {
-                //TODO: Schedule these
-                sys.Run();
+                commandBuilder.Schedule(sys);
             }
         }
 
-        void ICommandStage.AddSystem(ICommandSystem system)
+        void ICommandStage.AddSystem(ICommandSystem system, bool RunOnce = false)
         {
-            Systems.Add(system);
+            if(RunOnce)
+            {
+                RunOnceSystems.Add(system);
+            }
+            else
+            {
+                Systems.Add(system);
+            }
+           
         }
 
         public override string ToString()

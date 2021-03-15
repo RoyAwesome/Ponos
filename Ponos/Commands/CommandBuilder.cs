@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Ponos.Commands
 {
-    class CommandBuilder : ICommandBuilder, IApplicationEventListener
+    public class CommandBuilder : ICommandBuilder, IApplicationEventListener
     {
         Dictionary<string, ICommandStage> Stages = new();
 
@@ -45,7 +45,7 @@ namespace Ponos.Commands
                 return Stages[name];
             }
 
-            CommandStage stage = new(name);
+            CommandStage stage = new(name, this);
             Stages[name] = stage;
 
             return stage;
@@ -68,6 +68,16 @@ namespace Ponos.Commands
             mockScheduler.ScheduleStage(stage);
            
             return stage;
+        }
+
+        void ICommandBuilder.ScheduleSystem(ICommandSystem system)
+        {
+            Schedule(system);
+        }
+
+        public void Schedule(ICommandSystem system)
+        {
+            system.Run();
         }
     }
 }

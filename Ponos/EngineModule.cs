@@ -3,10 +3,8 @@ using Microsoft.Extensions.Hosting;
 using Ponos.API;
 using Ponos.API.Commands;
 using Ponos.API.Interfaces;
-using Ponos.API.Tasks;
 using Ponos.API.Threading;
 using Ponos.Commands;
-using Ponos.Threading;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,12 +27,7 @@ namespace Ponos
                 .As<IHostedService>()
                 .Named<IHostedService>(Names.EngineServiceName)
                 .SingleInstance();
-
-            builder.RegisterType<ThreadService>()
-                .As<ITaskService>()
-                .As<IThreadService>()
-                .Named<IThreadService>(Names.ThreadingServiceName)
-                .SingleInstance();
+                       
 
             builder.RegisterType<CommandBuilder>()
                 .As<ICommandBuilder>()

@@ -35,8 +35,10 @@ namespace Ponos.Startup
         {
             containerBuilder.RegisterModule<NLogModule>();
             containerBuilder.RegisterModule<EngineModule>();
-            containerBuilder.RegisterModule<VeldridModule>(); //TODO: Make this discoverable
+            containerBuilder.RegisterModule<VeldridModule>();
+            containerBuilder.RegisterModule<Ponos.Samples.BasicRendering.GameModule>(); //FIXME: Implement auto discovery of modules, and make this selectable by the engine
             containerBuilder.RegisterType<NullGameInstance>().As<IGameInstance>().SingleInstance();
+            containerBuilder.RegisterType<Ponos.API.ECS.EntityWorld>().AsSelf().SingleInstance();
         }
 
         private static void ConfigureLogger()

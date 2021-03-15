@@ -14,6 +14,8 @@ namespace Ponos.API.Commands
 
         protected internal ICommandStage ScheduleStage(string name, CommandStageRunMode RunMode, double fixedRate = 0.0f);
 
+        protected internal void ScheduleSystem(ICommandSystem system);
+
         public ICommandStage GetStageByName(string name);
     }
 
@@ -98,6 +100,11 @@ namespace Ponos.API.Commands
             return commandBuilder;
         }
        
+        public static ICommandBuilder RunSystemOnce(this ICommandBuilder commandBuilder, ICommandSystem system)
+        {
+            commandBuilder.ScheduleSystem(system);
+            return commandBuilder;
+        }
         
     }
 }

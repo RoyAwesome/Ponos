@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -16,6 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Ponos.API\Ponos.API.csproj" />
     <ProjectReference Include="..\Ponos.RenderGraph\Ponos.RenderGraph.Veldrid.csproj" />
+    <ProjectReference Include="..\Ponos.Samples.BasicRendering\Ponos.Samples.BasicRendering.csproj" />
     <ProjectReference Include="..\Ponos\Ponos.csproj" />
   </ItemGroup>
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Hosting;
 using NLog;
 using Ponos.API;
+using Ponos.API.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,14 +16,9 @@ namespace Ponos.Startup
         public string Version => "1.0.0";
 
         public string Name => "Null Game Instance";
-
-        private readonly ILogger Logger;
-
-        public NullGameInstance(ILogger logger)
+       
+        public NullGameInstance()
         {
-            Logger = logger;
-            Logger.Warn("Instanced");
-        }
-
+        }      
     }
 }

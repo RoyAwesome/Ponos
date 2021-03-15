@@ -45,7 +45,7 @@ namespace Ponos.API.Commands
             get;
         }
 
-        protected internal void AddSystem(ICommandSystem system);
+        protected internal void AddSystem(ICommandSystem system, bool RunOnce = false);
 
         public void Execute();
 
@@ -61,6 +61,17 @@ namespace Ponos.API.Commands
             }
 
             stage.AddSystem(system);
+            return stage;
+        }
+
+        public static ICommandStage AddSystemRunOnce(this ICommandStage stage, ICommandSystem system)
+        {
+            if (system == null)
+            {
+                throw new ArgumentNullException(nameof(system));
+            }
+
+            stage.AddSystem(system, true);
             return stage;
         }
     }

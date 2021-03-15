@@ -12,6 +12,6 @@ namespace Ponos.API
         public string Version
         {
             get;
-        }
+        }      
     }
 }

@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Ponos
 {
-    class MockScheduler : IApplicationEventListener
+    public class MockScheduler : IApplicationEventListener
     {
         class FixedRateStage
         {

@@ -8,7 +8,6 @@ using Autofac;
 using Autofac.Core;
 using System.Collections.Generic;
 using Ponos.API.Threading;
-using Ponos.Threading;
 using Ponos.API.Interfaces;
 using Ponos.API.Commands;
 
@@ -78,14 +77,7 @@ namespace Ponos
         {
             Logger.Info("Starting up {0} version: {1}", Name, Version);
 
-            var threader = componentContext.Resolve<IThreadService>() as ThreadService;
-            int numberOfThreads = Environment.ProcessorCount;
-            Logger.Info("Starting up Threading Service, {0}, with {1} threads", threader.Name, numberOfThreads);
-            threader.Startup(numberOfThreads);
-
-
-
-
+         
             Logger.Info("Found Game Instances: ");
             var gameInstances = componentContext.Resolve<IEnumerable<IGameInstance>>();
             foreach(var gi in gameInstances)

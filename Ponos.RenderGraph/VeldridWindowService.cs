@@ -8,7 +8,6 @@ using Ponos.API.Interfaces;
 using Ponos.API;
 using Ponos.API.Threading;
 using System.Threading;
-using Ponos.API.Tasks;
 using Veldrid.StartupUtilities;
 using Veldrid;
 using Veldrid.Sdl2;
